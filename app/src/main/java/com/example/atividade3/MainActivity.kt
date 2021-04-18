@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var brightness: Sensor? = null
     private var proximidade: Sensor? = null
+   lateinit var list:Sensor
 
     private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
            binding.tvText.isVisible=true;
            binding.circularProgressBar.isVisible=true
            binding.tvSquare.isVisible= false
+           binding.tvGiro.isVisible=false
            setUpSensor(1)
        }
 
@@ -45,7 +47,8 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
             binding.tvProx.isVisible=false
             binding.tvSquare.isVisible= true
             binding.circularProgressBar.isVisible=false
-            binding.tvText.isVisible=false;
+            binding.tvText.isVisible=false
+            binding.tvGiro.isVisible=false
         }
 
         binding.buttonproximidade.setOnClickListener {
@@ -53,7 +56,8 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
             binding.tvProx.isVisible=true
             binding.circularProgressBar.isVisible=false
             binding.tvSquare.isVisible= false
-            binding.tvText.isVisible=false;
+            binding.tvText.isVisible=false
+            binding.tvGiro.isVisible=false
             setUpSensor(3)
         }
 
@@ -63,7 +67,8 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
             binding.circularProgressBar.isVisible=false
             binding.tvSquare.isVisible= false
             binding.tvProx.isVisible=false
-            binding.tvText.isVisible=false;
+            binding.tvText.isVisible=false
+            binding.tvGiro.isVisible=true
             setUpSensor(4)
         }
 
@@ -96,7 +101,14 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
                 }
             }
             4 ->{
-                brightness =sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+                 list =sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE).also {
+                     sensorManager.registerListener(
+                         this,
+                         it,
+                         SensorManager.SENSOR_DELAY_FASTEST,
+                         SensorManager.SENSOR_DELAY_FASTEST
+                     )
+                 }
             }
         }
 
@@ -155,6 +167,15 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
 
 
           }
+          Sensor.TYPE_GYROSCOPE ->{
+              var s = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER)
+
+              val x= event.values[0]
+              val y= event.values[1]
+              val z= event.values[2]
+
+              binding.tvGiro.text="X: ${(x.toInt())} y: ${(y.toInt())} z: ${(z.toInt())}"
+          }
 
       }
 
@@ -186,10 +207,7 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
         sensorManager.unregisterListener(this)
         super.onDestroy()
     }
-//    private var proximitySensorEventListener = object : SensorEventListener {
-//        override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-//
-//        }
+
 }
 
 
